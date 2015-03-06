@@ -228,7 +228,7 @@ void main(string[] args)
 			index++;
 			size_t l = read32!(uint)(index, bytes);
 			index += l + 1;
-			writeln("bin32: not shown");
+			writeln("ext32: not shown");
 			break;
 		case 0xca: // float 32  11001010
 			index++;
