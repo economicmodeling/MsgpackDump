@@ -104,8 +104,12 @@ private T read64(T)(ref size_t index, const ubyte[] bytes) if (T.sizeof == 8)
 
 void main(string[] args)
 {
-	enforce(args.length > 1, "A path to a MessagePack file is required");
-	File f = File(args[1]);
+	File f;
+	if (args.length >= 2)
+		f = File(args[1]);
+	else
+		f = stdin;
+
 	size_t index = 0;
 	ubyte[] bytes = new ubyte[](f.size);
 	f.rawRead(bytes);
