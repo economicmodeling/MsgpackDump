@@ -104,8 +104,22 @@ private T read64(T)(ref size_t index, const ubyte[] bytes) if (T.sizeof == 8)
 
 void main(string[] args)
 {
-	enforce(args.length > 1, "A path to a MessagePack file is required");
-	File f = File(args[1]);
+	// If true, assume that the bin formats actually represent UTF-8 strings.
+	// This is useful for msgpack data that uses a version of the spec before v5
+	//  (when a dedicated string type was added).
+	bool assumeStrings = false;
+
+	import std.getopt;
+	args.getopt(
+		"strings|s", { assumeStrings = true; }
+	);
+
+	File f;
+	if (args.length >= 2)
+		f = File(args[1]);
+	else
+		f = stdin;
+
 	size_t index = 0;
 	ubyte[] bytes = new ubyte[](f.size);
 	f.rawRead(bytes);
@@ -163,20 +177,41 @@ void main(string[] args)
 			break;
 		case 0xc4: // bin 8  11000100
 			index++;
-			index += bytes[index] + 1;
-			writeln("bin8: not shown");
+			if (assumeStrings)
+			{
+				size_t l = bytes[index++];
+				writeln("bin8: ", cast(char[])bytes[index .. index + l]);
+				index += l;
+			} else {
+				index += bytes[index] + 1;
+				writeln("bin8: not shown");
+			}
 			break;
 		case 0xc5: // bin 16  11000101
 			index++;
-			size_t l = read16!(ushort)(index, bytes);
-			index += l;
-			writeln("bin16: not shown");
+			if (assumeStrings)
+			{
+				size_t l = read16!(ushort)(index, bytes);
+				writeln("bin16: ", cast(char[])bytes[index .. index + l]);
+				index += l;
+			} else {
+				size_t l = read16!(ushort)(index, bytes);
+				index += l;
+				writeln("bin16: not shown");
+			}
 			break;
 		case 0xc6: // bin 32  11000110
 			index++;
-			size_t l = read32!(uint)(index, bytes);
-			index += l;
-			writeln("bin32: not shown");
+			if (assumeStrings)
+			{
+				size_t l = read32!(uint)(index, bytes);
+				writeln("bin32: ", cast(char[])bytes[index .. index + l]);
+				index += l;
+			} else {
+				size_t l = read32!(uint)(index, bytes);
+				index += l;
+				writeln("bin32: not shown");
+			}
 			break;
 		case 0xc7: // ext 8  11000111
 			index++;
@@ -193,7 +228,7 @@ void main(string[] args)
 			index++;
 			size_t l = read32!(uint)(index, bytes);
 			index += l + 1;
-			writeln("bin32: not shown");
+			writeln("ext32: not shown");
 			break;
 		case 0xca: // float 32  11001010
 			index++;
