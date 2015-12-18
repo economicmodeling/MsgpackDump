@@ -83,22 +83,25 @@ private ulong bswap(ulong u)
 
 private T read16(T)(ref size_t index, const ubyte[] bytes) if (T.sizeof == 2)
 {
-	T r = cast(T) bswap(*(cast(ushort*) (bytes.ptr + index)));
-	index += 2;
+	auto buf = bswap(*(cast(ushort*) (bytes.ptr + index)));
+        T r = *(cast(T*) &buf);
+        index += 2;
 	return r;
 }
 
 private T read32(T)(ref size_t index, const ubyte[] bytes) if (T.sizeof == 4)
 {
-	T r = cast(T) bswap(*(cast(uint*) (bytes.ptr + index)));
-	index += 4;
+	auto buf = bswap(*(cast(uint*) (bytes.ptr + index)));
+        T r = *(cast(T*) &buf);
+        index += 4;
 	return r;
 }
 
 private T read64(T)(ref size_t index, const ubyte[] bytes) if (T.sizeof == 8)
 {
-	T r = cast(T) bswap(*(cast(ulong*) (bytes.ptr + index)));
-	index += 8;
+	auto buf = bswap(*(cast(ulong*) (bytes.ptr + index)));
+        T r = *(cast(T*) &buf);
+        index += 8;
 	return r;
 }
 
