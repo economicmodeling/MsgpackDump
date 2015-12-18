@@ -251,6 +251,7 @@ void main(string[] args)
 			writeln("uint32: ", read32!uint(index, bytes));
 			break;
 		case 0xcf: // uint 64  11001111
+		        index++;
 			writeln("uint64: ", read64!ulong(index, bytes));
 			break;
 		case 0xd0: // int 8  11010000
