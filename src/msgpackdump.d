@@ -316,7 +316,7 @@ void main(string[] args)
 			index++;
 			size_t l = read16!ushort(index, bytes);
 			itemCounts ~= l;
-			writeln("array32: ", l, " items");
+			writeln("array16: ", l, " items");
 			index += l;
 			break;
 		case 0xdd: // array 32  11011101
